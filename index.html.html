@@ -1,0 +1,89 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Multi-Code Translator</title>
+<style>
+body { font-family: Arial, sans-serif; background:#0f0f14; color:#eaeaf0; padding:20px; }
+textarea { width:100%; height:120px; background:#1b1b26; color:#eaeaf0; border:1px solid #333; padding:10px; margin-top:10px; }
+button { margin-top:10px; padding:10px 14px; background:#3b5cff; color:white; border:none; cursor:pointer; }
+button:hover { opacity:0.9; }
+pre { background:#1b1b26; padding:10px; border:1px solid #333; margin-top:10px; }
+select { padding:6px; margin-top:10px; background:#1b1b26; color:#eaeaf0; border:1px solid #333; }
+h2 { margin-bottom:5px; }
+</style>
+</head>
+<body>
+
+<h2>Multi-Code Translator</h2>
+
+<label for="codeSelect">Select Code:</label>
+<select id="codeSelect">
+  <option value="number">Number Code</option>
+  <option value="letters">Letters-Only Code</option>
+</select>
+
+<textarea id="input" placeholder="Type text or code here..."></textarea>
+
+<br>
+<button onclick="encode()">Encode</button>
+<button onclick="decode()">Decode</button>
+
+<h3>Output</h3>
+<pre id="output"></pre>
+
+<script>
+const codes = {
+  number: {
+    key: {
+      "A":"31","B":"25","C":"13","D":"43","E":"12","F":"35","G":"21","H":"32","I":"11","J":"45","K":"24","L":"33",
+      "M":"14","N":"41","O":"22","P":"34","Q":"15","R":"42","S":"23","T":"44","U":"16","V":"36","W":"26","X":"51","Y":"17","Z":"46"
+    },
+    rev: {}
+  },
+  letters: {
+    key: {
+      "A":"KA","B":"ZU","C":"ME","D":"RA","E":"TI","F":"LO","G":"SA","H":"NE","I":"KI","J":"VO","K":"DA","L":"RE",
+      "M":"MI","N":"NO","O":"TA","P":"SE","Q":"XI","R":"LA","S":"SO","T":"TE","U":"KU","V":"VA","W":"WE","X":"XO","Y":"YA","Z":"ZE"
+    },
+    rev: {}
+  }
+};
+
+// Build reverse keys
+for (let c in codes) {
+  codes[c].rev = Object.fromEntries(Object.entries(codes[c].key).map(a => [a[1], a[0]]));
+}
+
+function getCurrentCode() {
+  const selected = document.getElementById("codeSelect").value;
+  return codes[selected];
+}
+
+function encode() {
+  const code = getCurrentCode();
+  const text = document.getElementById("input").value.toUpperCase();
+  let result = [];
+  for (let ch of text) {
+    if (code.key[ch]) result.push(code.key[ch]);
+    else if (ch === " ") result.push("/");
+  }
+  document.getElementById("output").textContent = result.join(" ");
+}
+
+function decode() {
+  const code = getCurrentCode();
+  const input = document.getElementById("input").value.toUpperCase();
+  const segments = code.key === codes.letters.key ? input.split(" ") : input.split(" ");
+  let result = "";
+  for (let s of segments) {
+    if (code.rev[s]) result += code.rev[s];
+    else if (s === "/") result += " ";
+  }
+  document.getElementById("output").textContent = result;
+}
+</script>
+
+</body>
+</html>
